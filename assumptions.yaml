@@ -1,0 +1,185 @@
+# =============================================================================
+# NEXT plc (LSE: NXT) — DCF assumptions
+# =============================================================================
+# Every number you might want to argue about lives in this file. The Python
+# code contains no hard-coded assumptions, so a marker can see exactly what you
+# assumed and change one line to test it.
+#
+# Everything is in POUNDS STERLING. Next reports in GBP and trades in London,
+# so unlike a euro-reporting company there is no currency conversion anywhere
+# in this model. Cash flows, discount rate and share price are all sterling.
+#
+# Base year is the 53-week financial year ended 31 January 2026 ("FY2026").
+# -----------------------------------------------------------------------------
+
+meta:
+  company: NEXT plc
+  ticker: NXT.L
+  currency: GBP
+  units: GBP millions
+  base_year: FY2026 (53 weeks to 31 January 2026)
+  valuation_date: 2026-02-01   # start of the first forecast year
+  analyst: BSc Finance, University of Exeter
+
+# -----------------------------------------------------------------------------
+# 1. BASE YEAR ACTUALS — FY2026, the 53 weeks to 31 January 2026
+# -----------------------------------------------------------------------------
+# NOTE ON THE 53rd WEEK: FY2026 contained 53 trading weeks rather than the usual
+# 52. That extra week inflates the base year by roughly 2% of revenue. The
+# FY2027 growth assumption below is reduced to absorb the unwind. If you ignore
+# this you will overstate every forecast year, because you are compounding
+# growth off an artificially high base.
+base_year_financials:
+  revenue: 6901.0                  # Statutory revenue, including credit account interest
+  operating_profit: 1276.0         # EBIT, an 18.50% margin
+  profit_before_tax: 1190.0
+  depreciation_amortisation: 325.3 # Includes right-of-use asset depreciation
+  capital_expenditure: 135.4
+  reported_free_cash_flow: 1098.0
+  net_debt_excluding_leases: 1714.0
+  lease_liabilities: 1030.0        # ESTIMATE: long-term £831.7m plus current portion.
+                                   # VERIFY against the lease note in the annual report.
+  customer_receivables: 1583.0     # The Next Finance credit book, see section 2
+
+# -----------------------------------------------------------------------------
+# 2. FORECAST DRIVERS
+# -----------------------------------------------------------------------------
+# revenue_growth: FY2027 is held at 4.0% because the lost 53rd week is roughly a
+#   2% drag on a business otherwise growing mid-single digits. Growth then fades
+#   towards the terminal rate. Next has compounded faster than this recently
+#   (+12.8% in FY2026), helped by overseas and third-party brands, but
+#   extrapolating that for five years would be heroic.
+#
+# operating_margin: 18.50% in FY2026, up from 17.88%. Next runs an explicit
+#   internal hurdle on new capital and has been disciplined on costs. Modest
+#   expansion assumed, but note that the overseas and Total Platform mix is
+#   structurally lower margin than UK retail, which caps this.
+#
+# depreciation_amortisation_pct_revenue: FY2026 D&A was 4.71% of revenue, far
+#   above capex at 1.96%. That gap is almost entirely right-of-use asset
+#   depreciation under IFRS 16 — see the lease treatment note below.
+#
+# rou_depreciation_pct_revenue: THE PORTION OF D&A THAT IS LEASE DEPRECIATION.
+#   ESTIMATE. Replace it with the real figure from the property, plant and
+#   equipment / right-of-use note. It only matters if you switch lease_treatment
+#   to "expensed", but getting it right makes that comparison meaningful.
+#
+# cash_rent_pct_revenue: TOTAL CASH LEASE PAYMENTS, used only under the
+#   "expensed" treatment. It is deliberately HIGHER than right-of-use
+#   depreciation, because cash rent equals that depreciation plus the lease
+#   interest charge. Under IFRS 16 the interest sits below EBIT; under the
+#   pre-IFRS 16 view the whole rent is an operating cost. ESTIMATE — replace
+#   from the cash flow statement's lease payment line.
+#
+# net_working_capital_pct_revenue: POSITIVE and large, the opposite of a
+#   supermarket or an FMCG group. Next lends to its own customers through Next
+#   Finance, so the credit book (£1,583m, c.23% of revenue) sits in receivables.
+#   Growth therefore CONSUMES cash: every extra pound of credit sales ties up
+#   working capital before it comes back. This is the single biggest difference
+#   between valuing Next and valuing a company with negative working capital.
+forecast:
+  years: [FY2027, FY2028, FY2029, FY2030, FY2031]
+  revenue_growth:                        [0.0400, 0.0450, 0.0400, 0.0350, 0.0300]
+  operating_margin:                      [0.1860, 0.1870, 0.1880, 0.1885, 0.1890]
+  depreciation_amortisation_pct_revenue: [0.0470, 0.0470, 0.0465, 0.0465, 0.0460]
+  rou_depreciation_pct_revenue:          [0.0250, 0.0250, 0.0250, 0.0250, 0.0250]
+  cash_rent_pct_revenue:                 [0.0300, 0.0300, 0.0295, 0.0295, 0.0290]
+  capex_pct_revenue:                     [0.0200, 0.0200, 0.0200, 0.0195, 0.0195]
+  net_working_capital_pct_revenue:       [0.2000, 0.2000, 0.1980, 0.1960, 0.1950]
+  effective_tax_rate: 0.255    # UK corporation tax is 25%; Next's effective rate
+                               # was c.25.3% in FY2026 (PBT £1,190m, PAT £888.5m)
+
+# -----------------------------------------------------------------------------
+# 3. LEASE TREATMENT — the choice that matters most for a retailer
+# -----------------------------------------------------------------------------
+# Next operates c.450 UK stores, nearly all leased. Under IFRS 16 those leases
+# sit on the balance sheet as a liability with a matching right-of-use asset,
+# and the rent charge is split into depreciation and interest. That is why D&A
+# (4.7% of revenue) is more than double capex (2.0%).
+#
+# There are two internally consistent ways to handle this, and mixing them is a
+# serious error that inflates the valuation:
+#
+#   "capitalised" (IFRS 16, the default and the market standard)
+#       - add back ALL depreciation, including right-of-use depreciation
+#       - treat lease liabilities as debt, so DEDUCT them in the equity bridge
+#       Rationale: leases are a financing decision, so lease payments are
+#       debt service and belong below the enterprise value line.
+#
+#   "expensed" (pre-IFRS 16, rent as an operating cost)
+#       - add back only non-lease depreciation
+#       - do NOT deduct lease liabilities, because the rent cost is already
+#         inside the cash flow
+#
+# THE TRAP: adding back right-of-use depreciation while ignoring lease
+# liabilities counts the benefit of the lease and none of the cost. On Next that
+# single inconsistency is worth well over £1bn of phantom equity value.
+lease_treatment: capitalised
+
+# -----------------------------------------------------------------------------
+# 4. WACC INPUTS
+# -----------------------------------------------------------------------------
+# Sterling cash flows require a sterling discount rate, so the risk-free rate is
+# the 10-year gilt. Note how high it currently is by historical standards; this
+# is the main reason Next's WACC comes out well above a typical textbook 8%.
+wacc:
+  risk_free_rate: 0.0548          # 10-year gilt, early October 2026
+  equity_risk_premium: 0.0500     # UK mature-market ERP
+  country_risk_premium: 0.0000    # Predominantly UK and developed-market revenue
+  levered_beta: 1.05              # Discretionary clothing retail is cyclical,
+                                  # so beta is well above a consumer staple
+
+  # Beta re-levering (optional). If relever_beta is true the code unlevers
+  # `levered_beta` at `current_debt_to_equity` and re-levers at
+  # `target_debt_to_equity` using Hamada: BL = BU * (1 + (1-t) * D/E).
+  relever_beta: false
+  current_debt_to_equity: 0.161
+  target_debt_to_equity: 0.161
+
+  pre_tax_cost_of_debt: 0.0630    # Gilt plus c.80bp; Next is investment grade
+  marginal_tax_rate: 0.25         # UK corporation tax rate
+
+  # Capital structure weights use MARKET values, never book.
+  debt_measure: net_debt          # "net_debt" or "gross_debt"
+  gross_debt: 1810.0              # Used only if debt_measure is gross_debt
+
+# -----------------------------------------------------------------------------
+# 5. TERMINAL VALUE
+# -----------------------------------------------------------------------------
+# method: "gordon_growth" (primary) or "exit_multiple".
+# The code ALWAYS reports both so you can cross-check them against each other.
+terminal_value:
+  method: gordon_growth
+  perpetuity_growth_rate: 0.0250  # Slightly above the 2% inflation target to
+                                  # reflect real growth; must stay below the WACC
+  exit_ev_ebitda_multiple: 8.0    # Retail trades well below staples; Next has
+                                  # historically changed hands at c.7-9x EBITDA
+
+# -----------------------------------------------------------------------------
+# 6. DISCOUNTING
+# -----------------------------------------------------------------------------
+discounting:
+  mid_year_convention: true       # Cash arrives through the year, so discount at t-0.5
+
+# -----------------------------------------------------------------------------
+# 7. EQUITY BRIDGE AND MARKET DATA
+# -----------------------------------------------------------------------------
+# Lease liabilities are added to net debt automatically when lease_treatment is
+# "capitalised", so do not double count them here.
+equity_bridge:
+  pension_deficit: 0.0            # Next's scheme has run in surplus; verify and adjust
+  minority_interests: 118.0       # Non-controlling interests
+  investments: 35.2               # Long-term investments and equity stakes
+  shares_outstanding: 119.66      # Millions, at 29 May 2026. Next buys back
+                                  # aggressively (£721.9m in FY2026), so this falls
+
+market:
+  share_price_pence: 14210.0      # NXT.L, early October 2026
+
+# -----------------------------------------------------------------------------
+# 8. SENSITIVITY GRID
+# -----------------------------------------------------------------------------
+sensitivity:
+  wacc_deltas: [-0.0150, -0.0075, 0.0, 0.0075, 0.0150]
+  growth_deltas: [-0.0100, -0.0050, 0.0, 0.0050, 0.0100]
+  margin_deltas: [-0.0150, -0.0075, 0.0, 0.0075, 0.0150]

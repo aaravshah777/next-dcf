@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Model outputs (regenerate with: python run_dcf.py --export)
+outputs/*.csv
+outputs/*.png
+
+# Editors and OS
+.vscode/
+.idea/
+.DS_Store
+*.swp
+
+# Notebooks
+.ipynb_checkpoints/
