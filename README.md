@@ -1,6 +1,6 @@
 # NEXT plc — Discounted Cash Flow Model
 
-[![CI](https://github.com/aaravshah777/supreme-guacamole/actions/workflows/ci.yml/badge.svg)](https://github.com/aaravshah777/supreme-guacamole/actions/workflows/ci.yml)
+[![CI](https://github.com/aaravshah777/next-dcf/actions/workflows/ci.yml/badge.svg)](https://github.com/aaravshah777/next-dcf/actions/workflows/ci.yml)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/downloads/)
 
 A transparent, fully tested DCF valuation of **NEXT plc (LSE: NXT)** in Python.
@@ -46,7 +46,7 @@ raises.
 ## Quick start
 
 ```bash
-git clone https://github.com/aaravshah777/supreme-guacamole.git
+git clone https://github.com/aaravshah777/next-dcf.git
 cd next-dcf
 
 python -m venv .venv
